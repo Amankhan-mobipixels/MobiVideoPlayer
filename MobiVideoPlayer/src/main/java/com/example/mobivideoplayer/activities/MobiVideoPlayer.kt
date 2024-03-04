@@ -2,6 +2,7 @@ package com.example.mobivideoplayer.activities
 
 import android.app.PictureInPictureParams
 import android.content.ContentResolver
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -205,6 +206,12 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                         val aspectRatio = Rational(9, 16)
                         pictureInPicture!!.setAspectRatio(aspectRatio)
                         enterPictureInPictureMode(pictureInPicture!!.build())
+
+
+                        // Create a new intent to bring the app to the background
+                        val homeIntent = Intent(Intent.ACTION_MAIN)
+                        homeIntent.addCategory(Intent.CATEGORY_HOME)
+                        startActivity(homeIntent)
                     } else {
                         Log.wtf("not oreo", "yes")
                     }
