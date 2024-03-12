@@ -1,4 +1,4 @@
-# Admob-Ads
+# Mobi Video Player
 add maven in your project level gradle
 ````
 allprojects {
