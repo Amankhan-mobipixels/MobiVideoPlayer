@@ -1,5 +1,6 @@
 package com.example.mobivideoplayer.activities
 
+import android.annotation.SuppressLint
 import android.app.PictureInPictureParams
 import android.content.ContentResolver
 import android.content.Intent
@@ -36,6 +37,8 @@ import com.example.mobivideoplayer.databinding.ActivityVideoPlayerBinding
 import com.example.mobivideoplayer.models.IconData
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Player.PositionInfo
@@ -197,6 +200,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
         recyclerViewIcons!!.layoutManager = layoutManager
         recyclerViewIcons!!.adapter = playbackIconsAdapter
         playbackIconsAdapter?.setOnItemClickListener(object : IconsAdapter.OnItemClickListener {
+            @SuppressLint("Range")
             override fun onItemClick(position: Int) {
                 if (position == 0) {
                     //popup
@@ -253,7 +257,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                 if (position == 4) {
                     //speed
                     val alertDialog = AlertDialog.Builder(this@MobiVideoPlayer)
-                    alertDialog.setTitle("Select PLayback Speed").setPositiveButton("OK", null)
+                    alertDialog.setTitle("Select Playback Speed")
                     val items = arrayOf("0.5x", "1x Normal Speed", "1.25x", "1.5x", "2x")
                     val checkedItem = -1
                     alertDialog.setSingleChoiceItems(
@@ -289,12 +293,11 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                                 parameters = PlaybackParameters(speed)
                                 player?.playbackParameters = parameters!!
                             }
-
-                            else -> {}
                         }
+                        dialog.dismiss() // Dismiss the dialog after the item is clicked
                     }
-                    val alert = alertDialog.create()
-                    alert.show()
+                    val dialog = alertDialog.create()
+                    dialog.show()
                 }
             }
         })
@@ -331,11 +334,13 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
     }
 
     private fun playVideo() {
-        player = SimpleExoPlayer.Builder(this).build()
+        player = SimpleExoPlayer.Builder(this).setSeekBackIncrementMs(10000)
+        .setSeekForwardIncrementMs(10000).build()
         val dataSourceFactory = DefaultDataSourceFactory(this, Util.getUserAgent(this, "app"))
         concatenatingMediaSource = ConcatenatingMediaSource()
         for (i in 0 until mVideoFiles!!.size) {
-            val mediaSource: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(mVideoFiles!![i]))
+            val mediaSource: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(
+                MediaItem.fromUri(Uri.parse(mVideoFiles!![i])))
             concatenatingMediaSource!!.addMediaSource(mediaSource)
         }
         binding.exoplayerView?.player = player
@@ -346,7 +351,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
         player?.prepare(concatenatingMediaSource!!)
         player!!.seekTo(position, (mVideoFiles!!.size - 1).toLong())
         playError()
-        player?.addListener(object : Player.EventListener {
+        player?.addListener(object : Player.Listener {
             // when video complete it moves to next one
             override fun onPositionDiscontinuity(
                 oldPosition: PositionInfo,
@@ -388,10 +393,10 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
     }
 
     private fun playError() {
-        player?.addListener(object : Player.EventListener {
-            override fun onPlayerError(error: ExoPlaybackException) {
-                Toast.makeText(this@MobiVideoPlayer, "Video Playing Error", Toast.LENGTH_SHORT)
-                    .show()
+
+        player?.addListener(object : Player.Listener {
+            override fun onPlayerError(error: PlaybackException) {
+                Toast.makeText(this@MobiVideoPlayer, "Video Playing Error", Toast.LENGTH_SHORT).show()
             }
         })
         player?.playWhenReady = true
