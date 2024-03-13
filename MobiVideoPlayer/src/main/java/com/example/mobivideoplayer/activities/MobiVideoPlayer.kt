@@ -36,7 +36,6 @@ import com.example.mobivideoplayer.adapters.IconsAdapter
 import com.example.mobivideoplayer.databinding.ActivityVideoPlayerBinding
 import com.example.mobivideoplayer.models.IconData
 import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.PlaybackParameters
@@ -188,12 +187,12 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
 
     private fun horizontalIconList() {
         if (isPiPSupported()) {
-            iconModelArrayList.add(IconData(R.drawable.ic_pip_mode, "Popup"))
+            iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_pip_mode, "Popup"))
         }
-        iconModelArrayList.add(IconData(R.drawable.ic_rotate, "Rotate"))
-        iconModelArrayList.add(IconData(R.drawable.ic_loop_all, "Loop"))
-        iconModelArrayList.add(IconData(R.drawable.ic_volume_off, "Mute"))
-        iconModelArrayList.add(IconData(R.drawable.ic_speed, "Speed"))
+        iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_rotate, "Rotate"))
+        iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_loop_all, "Loop"))
+        iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_volume_off, "Mute"))
+        iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_speed, "Speed"))
         playbackIconsAdapter = IconsAdapter(this,iconModelArrayList)
         val layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, true)
 
@@ -231,11 +230,11 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                 }
                 if (position == 2) {
                     if (loop) {
-                        iconModelArrayList[position] = IconData(R.drawable.ic_loop_one, "Loop")
+                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_loop_one, "Loop")
                         playbackIconsAdapter?.notifyDataSetChanged()
                         loop = false
                     } else {
-                        iconModelArrayList[position] = IconData(R.drawable.ic_loop_all, "Loop")
+                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_loop_all, "Loop")
                         playbackIconsAdapter?.notifyDataSetChanged()
                         loop = true
                     }
@@ -244,12 +243,12 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                     //mute
                     if (mute) {
                         player!!.volume = 100F
-                        iconModelArrayList[position] = IconData(R.drawable.ic_volume_off, "Mute")
+                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume_off, "Mute")
                         playbackIconsAdapter?.notifyDataSetChanged()
                         mute = false
                     } else {
                         player!!.volume = 0F
-                        iconModelArrayList[position] = IconData(R.drawable.ic_volume, "unMute")
+                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume, "unMute")
                         playbackIconsAdapter?.notifyDataSetChanged()
                         mute = true
                     }
@@ -504,21 +503,21 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
     private var firstListener : View.OnClickListener = View.OnClickListener {
         binding.exoplayerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
         player?.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
-        scaling?.setImageResource(R.drawable.ic_fill)
+        scaling?.setImageResource(R.drawable.ic_mobi_video_fill)
         Toast.makeText(this@MobiVideoPlayer, "Full Screen", Toast.LENGTH_SHORT).show()
         scaling?.setOnClickListener(secondListener)
     }
     private var secondListener : View.OnClickListener = View.OnClickListener {
         binding.exoplayerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         player?.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
-        scaling?.setImageResource(R.drawable.ic_zoom)
+        scaling?.setImageResource(R.drawable.ic_mobi_video_zoom)
         Toast.makeText(this@MobiVideoPlayer, "Zoom", Toast.LENGTH_SHORT).show()
         scaling?.setOnClickListener(thirdListener)
     }
     private var thirdListener : View.OnClickListener = View.OnClickListener {
         binding.exoplayerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
         player?.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
-        scaling?.setImageResource(R.drawable.ic_fit)
+        scaling?.setImageResource(R.drawable.ic_mobi_video_fit)
         Toast.makeText(this@MobiVideoPlayer, "Fit", Toast.LENGTH_SHORT).show()
         scaling?.setOnClickListener(firstListener)
     }

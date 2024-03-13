@@ -10,7 +10,7 @@
         android:layout_height="40dp"
         android:scaleType="centerInside"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/ic_lock"/>
+        android:src="@drawable/ic_mobi_video_lock"/>
     <TextView
         android:id="@+id/icon_title"
         android:layout_width="60dp"

@@ -12,7 +12,7 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/layer_above"
+    android:background="@drawable/mobi_video_layer_above"
     android:orientation="vertical">
     <LinearLayout
         android:id="@+id/toolbar"
@@ -28,7 +28,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:padding="10dp"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_mobi_video_back" />
 
         <TextView
             android:id="@+id/video_title"
@@ -59,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@drawable/layer_below"
+            android:background="@drawable/mobi_video_layer_below"
             android:gravity="bottom"
             android:orientation="vertical">
 
@@ -116,56 +116,56 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_unlock" />
+                    android:src="@drawable/ic_mobi_video_unlock" />
 
                 <ImageView
                     android:id="@+id/exo_rew"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_backward_10" />
+                    android:src="@drawable/ic_mobi_video_backward_10" />
 
                 <ImageView
                     android:id="@+id/exo_play_previous"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_previous" />
+                    android:src="@drawable/ic_mobi_video_previous" />
 
                 <ImageView
                     android:id="@+id/exo_play"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_play" />
+                    android:src="@drawable/ic_mobi_video_play" />
 
                 <ImageView
                     android:id="@+id/exo_pause"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_pause" />
+                    android:src="@drawable/ic_mobi_video_pause" />
 
                 <ImageView
                     android:id="@+id/exo_play_next"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_next" />
+                    android:src="@drawable/ic_mobi_video_next" />
 
                 <ImageView
                     android:id="@+id/exo_ffwd"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_forward_10" />
+                    android:src="@drawable/ic_mobi_video_forward_10" />
 
                 <ImageView
                     android:id="@+id/scaling"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_fit" />
+                    android:src="@drawable/ic_mobi_video_fit" />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
@@ -178,7 +178,7 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_lock"
+        android:src="@drawable/ic_mobi_video_lock"
         android:visibility="gone" />
 
 </RelativeLayout>
