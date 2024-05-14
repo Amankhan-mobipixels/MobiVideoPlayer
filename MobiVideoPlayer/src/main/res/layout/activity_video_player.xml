@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.VideoPlayerActivity">
+    android:layout_height="match_parent">
 
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/exoplayer_view"
@@ -20,5 +19,4 @@
         app:shutter_background_color="#000000"
         app:surface_type="surface_view"
         app:use_controller="true" />
-
 </RelativeLayout>

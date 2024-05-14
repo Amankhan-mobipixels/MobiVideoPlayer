@@ -11,6 +11,8 @@ import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.Rational
 import android.view.GestureDetector
@@ -30,9 +32,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobivideoplayer.R
 import com.example.mobivideoplayer.adapters.IconsAdapter
+import com.example.mobivideoplayer.adapters.PlaylistAdapter
+import com.example.mobivideoplayer.adapters.Selected
 import com.example.mobivideoplayer.databinding.ActivityVideoPlayerBinding
 import com.example.mobivideoplayer.models.IconData
 import com.google.android.exoplayer2.C
@@ -48,9 +53,10 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.io.File
 
-class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
+class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
     var mVideoFiles: ArrayList<String>? = null
     var player: SimpleExoPlayer? = null
     var position = 0
@@ -186,12 +192,13 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
     }
 
     private fun horizontalIconList() {
+        iconModelArrayList.add(IconData(R.drawable.ic_mobi_playlist, "Playlist"))
         if (isPiPSupported()) {
             iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_pip_mode, "Popup"))
         }
         iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_rotate, "Rotate"))
         iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_loop_all, "Loop"))
-        iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_volume_off, "Mute"))
+        iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_volume, "Mute"))
         iconModelArrayList.add(IconData(R.drawable.ic_mobi_video_speed, "Speed"))
         playbackIconsAdapter = IconsAdapter(this,iconModelArrayList)
         val layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, true)
@@ -201,7 +208,10 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
         playbackIconsAdapter?.setOnItemClickListener(object : IconsAdapter.OnItemClickListener {
             @SuppressLint("Range")
             override fun onItemClick(position: Int) {
-                if (position == 0) {
+                if (position == 0){
+                    dialogPlaylist()
+                }
+                if (position == 1) {
                     //popup
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         binding.exoplayerView!!.controllerAutoShow = false
@@ -219,7 +229,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                         Log.wtf("not oreo", "yes")
                     }
                 }
-                if (position == 1) {
+                if (position == 2) {
                     if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                         playbackIconsAdapter?.notifyDataSetChanged()
@@ -228,7 +238,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                         playbackIconsAdapter?.notifyDataSetChanged()
                     }
                 }
-                if (position == 2) {
+                if (position == 3) {
                     if (loop) {
                         iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_loop_one, "Loop")
                         playbackIconsAdapter?.notifyDataSetChanged()
@@ -239,21 +249,21 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
                         loop = true
                     }
                 }
-                if (position == 3) {
+                if (position == 4) {
                     //mute
                     if (mute) {
                         player!!.volume = 100F
-                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume_off, "Mute")
+                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume, "Mute")
                         playbackIconsAdapter?.notifyDataSetChanged()
                         mute = false
                     } else {
                         player!!.volume = 0F
-                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume, "unMute")
+                        iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume_off, "UnMute")
                         playbackIconsAdapter?.notifyDataSetChanged()
                         mute = true
                     }
                 }
-                if (position == 4) {
+                if (position == 5) {
                     //speed
                     val alertDialog = AlertDialog.Builder(this@MobiVideoPlayer)
                     alertDialog.setTitle("Select Playback Speed")
@@ -346,38 +356,38 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
         binding.exoplayerView?.keepScreenOn = true
 //        parameters = PlaybackParameters(speed)
 //        player?.playbackParameters = parameters!!
-        player?.repeatMode = Player.REPEAT_MODE_OFF
         player?.prepare(concatenatingMediaSource!!)
         player!!.seekTo(position, (mVideoFiles!!.size - 1).toLong())
         playError()
         player?.addListener(object : Player.Listener {
-            // when video complete it moves to next one
-            override fun onPositionDiscontinuity(
-                oldPosition: PositionInfo,
-                newPosition: PositionInfo,
-                reason: Int
-            ) {
-                if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
-                    if (!loop) {
-                        player?.stop()
-                        playVideo()
-                        return
-                    }
-                    position++
-                }
-                Log.d("vhdf", reason.toString())
-                if (reason == Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT) {
-                    if (position == mVideoFiles!!.size - 1) {
-                        if (!loop) {
-                            player?.stop()
-                            playVideo()
-                            return
-                        }
-                        player?.stop()
+            // when end video completes
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                super.onPlayerStateChanged(playWhenReady, playbackState)
+                if (playbackState==Player.STATE_ENDED){
+                    player?.stop()
+                    if (loop) {
                         position = 0
-                        playVideo()
-                    }
+                        player?.repeatMode = Player.REPEAT_MODE_ALL
+
+                    } else player?.repeatMode = Player.REPEAT_MODE_ONE
+                    playVideo()
+                    title?.text = File(mVideoFiles!![position]).name
                 }
+            }
+            // when video complete it moves to next one
+            override fun onPositionDiscontinuity(oldPosition: PositionInfo, newPosition: PositionInfo, reason: Int) {
+                if (reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION) {
+                    player?.stop()
+                    if (loop) {
+                        position++
+                        player?.repeatMode = Player.REPEAT_MODE_ALL
+
+                    } else player?.repeatMode = Player.REPEAT_MODE_ONE
+                    playVideo()
+                    title?.text = File(mVideoFiles!![position]).name
+
+                }
+
             }
         })
         binding.exoplayerView?.setControllerVisibilityListener { visibility ->
@@ -441,7 +451,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
         )
     }
 
-    fun hideBottomBar() {
+    private fun hideBottomBar() {
         if (Build.VERSION.SDK_INT > 11 && Build.VERSION.SDK_INT < 19) {
             val v = getWindow().decorView
             v.systemUiVisibility = View.GONE
@@ -522,7 +532,41 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
         scaling?.setOnClickListener(firstListener)
     }
 
+    private fun dialogPlaylist(){
 
+        val dialog = BottomSheetDialog(this)
+        // on below line we are inflating a layout file which we have created.
+        val view = layoutInflater.inflate(R.layout.playlist_dialog, null)
+        dialog.setContentView(view)
+        val close = view.findViewById<ImageView>(R.id.close)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+
+        val mLayoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = mLayoutManager
+        val adapter = PlaylistAdapter(this,mVideoFiles!!,mVideoFiles!![position],this)
+        recyclerView.adapter = adapter
+
+        val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(this) {
+            override fun getVerticalSnapPreference(): Int {
+                return SNAP_TO_START
+            }
+        }
+        for (i in mVideoFiles!!.indices){
+            if (mVideoFiles!![i] == mVideoFiles!![position]) smoothScroller.targetPosition = i
+        }
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            mLayoutManager.startSmoothScroll(smoothScroller);
+        },200)
+
+        close?.setOnClickListener{
+            dialog.dismiss()
+        }
+
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+
+        dialog.show()
+    }
 
     override fun onStop() {
         super.onStop()
@@ -549,4 +593,16 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener {
             super.onScaleEnd(detector)
         }
     }
+
+    override fun Selected(path:String) {
+        for (i in mVideoFiles!!.indices){
+            if (mVideoFiles!![i] == path) {
+                player?.stop()
+                position= i
+                playVideo()
+                title?.text = File(mVideoFiles!![i]).name
+            }
+        }
+
+        }
 }
