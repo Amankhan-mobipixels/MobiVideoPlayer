@@ -77,6 +77,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
     var loop = true
     var parameters: PlaybackParameters? = null
     var speed = 1f
+    var currentPlayback = 1
     var pictureInPicture: PictureInPictureParams.Builder? = null
     var isCrossChecked = false
 
@@ -99,6 +100,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
     private var startX = 0f
     private var startY = 0f
     private var isSeeking = false
+    private var isVolume = true
     private lateinit var binding: ActivityVideoPlayerBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -252,11 +254,13 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
                 if (position == 4) {
                     //mute
                     if (mute) {
+                        isVolume = true
                         player!!.volume = 100F
                         iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume, "Mute")
                         playbackIconsAdapter?.notifyDataSetChanged()
                         mute = false
                     } else {
+                        isVolume = false
                         player!!.volume = 0F
                         iconModelArrayList[position] = IconData(R.drawable.ic_mobi_video_volume_off, "UnMute")
                         playbackIconsAdapter?.notifyDataSetChanged()
@@ -268,37 +272,42 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
                     val alertDialog = AlertDialog.Builder(this@MobiVideoPlayer)
                     alertDialog.setTitle("Select Playback Speed")
                     val items = arrayOf("0.5x", "1x Normal Speed", "1.25x", "1.5x", "2x")
-                    val checkedItem = -1
+                    val checkedItem = currentPlayback
                     alertDialog.setSingleChoiceItems(
                         items, checkedItem
                     ) { dialog, which ->
                         when (which) {
                             0 -> {
                                 speed = 0.5f
+                                currentPlayback = 0
                                 parameters = PlaybackParameters(speed)
                                 player?.playbackParameters = parameters!!
                             }
 
                             1 -> {
                                 speed = 1f
+                                currentPlayback = 1
                                 parameters = PlaybackParameters(speed)
                                 player?.playbackParameters = parameters!!
                             }
 
                             2 -> {
                                 speed = 1.25f
+                                currentPlayback = 2
                                 parameters = PlaybackParameters(speed)
                                 player?.playbackParameters = parameters!!
                             }
 
                             3 -> {
                                 speed = 1.5f
+                                currentPlayback = 3
                                 parameters = PlaybackParameters(speed)
                                 player?.playbackParameters = parameters!!
                             }
 
                             4 -> {
                                 speed = 2f
+                                currentPlayback = 4
                                 parameters = PlaybackParameters(speed)
                                 player?.playbackParameters = parameters!!
                             }
@@ -354,6 +363,11 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
         }
         binding.exoplayerView?.player = player
         binding.exoplayerView?.keepScreenOn = true
+       if (isVolume) player!!.volume = 1.0F
+        else player!!.volume = 0F
+        parameters = PlaybackParameters(speed)
+        player?.playbackParameters = parameters!!
+
 //        parameters = PlaybackParameters(speed)
 //        player?.playbackParameters = parameters!!
         player?.prepare(concatenatingMediaSource!!)
