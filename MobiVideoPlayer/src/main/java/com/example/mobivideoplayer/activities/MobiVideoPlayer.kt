@@ -221,8 +221,6 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
                         val aspectRatio = Rational(9, 16)
                         pictureInPicture!!.setAspectRatio(aspectRatio)
                         enterPictureInPictureMode(pictureInPicture!!.build())
-
-
                         // Create a new intent to bring the app to the background
                         val homeIntent = Intent(Intent.ACTION_MAIN)
                         homeIntent.addCategory(Intent.CATEGORY_HOME)
@@ -269,7 +267,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
                 }
                 if (position == 5) {
                     //speed
-                    val alertDialog = AlertDialog.Builder(this@MobiVideoPlayer)
+                    val alertDialog = AlertDialog.Builder(this@MobiVideoPlayer,R.style.CustomAlertDialogTheme)
                     alertDialog.setTitle("Select Playback Speed")
                     val items = arrayOf("0.5x", "1x Normal Speed", "1.25x", "1.5x", "2x")
                     val checkedItem = currentPlayback
@@ -350,7 +348,13 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
             pictureInPicture = PictureInPictureParams.Builder()
         }
     }
-
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        Log.d("dfsgfdgdf", isInPictureInPictureMode.toString())
+        if (!isInPictureInPictureMode) {
+            player?.pause()
+        }
+    }
     private fun playVideo() {
         player = SimpleExoPlayer.Builder(this).setSeekBackIncrementMs(10000)
         .setSeekForwardIncrementMs(10000).build()
