@@ -1,8 +1,10 @@
 package com.example.mobivideoplayer.activities
 
 import android.annotation.SuppressLint
+import android.app.AppOpsManager
 import android.app.PictureInPictureParams
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -208,14 +210,20 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
         recyclerViewIcons!!.layoutManager = layoutManager
         recyclerViewIcons!!.adapter = playbackIconsAdapter
         playbackIconsAdapter?.setOnItemClickListener(object : IconsAdapter.OnItemClickListener {
+            @RequiresApi(Build.VERSION_CODES.Q)
             @SuppressLint("Range")
             override fun onItemClick(position: Int) {
                 if (position == 0){
                     dialogPlaylist()
                 }
                 if (position == 1) {
+                    val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager?
+                    if (appOps?.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_PICTURE_IN_PICTURE, android.os.Process.myUid(), packageName) != AppOpsManager.MODE_ALLOWED){
+                        startActivityForResult(Intent("android.settings.PICTURE_IN_PICTURE_SETTINGS", Uri.parse("package:$packageName")), 0)
+                        return
+                    }
+
                     //popup
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         binding.exoplayerView!!.controllerAutoShow = false
                         binding.exoplayerView!!.hideController()
                         val aspectRatio = Rational(9, 16)
@@ -225,9 +233,6 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
                         val homeIntent = Intent(Intent.ACTION_MAIN)
                         homeIntent.addCategory(Intent.CATEGORY_HOME)
                         startActivity(homeIntent)
-                    } else {
-                        Log.wtf("not oreo", "yes")
-                    }
                 }
                 if (position == 2) {
                     if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -348,6 +353,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
             pictureInPicture = PictureInPictureParams.Builder()
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         Log.d("dfsgfdgdf", isInPictureInPictureMode.toString())
