@@ -537,21 +537,21 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
     private var firstListener : View.OnClickListener = View.OnClickListener {
         binding.exoplayerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
         player?.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
-        scaling?.setImageResource(R.drawable.ic_mobi_video_fill)
+        scaling?.setImageResource(R.drawable.ic_mobi_video_zoom)
         Toast.makeText(this@MobiVideoPlayer, "Full Screen", Toast.LENGTH_SHORT).show()
         scaling?.setOnClickListener(secondListener)
     }
     private var secondListener : View.OnClickListener = View.OnClickListener {
         binding.exoplayerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         player?.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
-        scaling?.setImageResource(R.drawable.ic_mobi_video_zoom)
+        scaling?.setImageResource(R.drawable.ic_mobi_video_fit)
         Toast.makeText(this@MobiVideoPlayer, "Zoom", Toast.LENGTH_SHORT).show()
         scaling?.setOnClickListener(thirdListener)
     }
     private var thirdListener : View.OnClickListener = View.OnClickListener {
         binding.exoplayerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
         player?.videoScalingMode = C.VIDEO_SCALING_MODE_DEFAULT
-        scaling?.setImageResource(R.drawable.ic_mobi_video_fit)
+        scaling?.setImageResource(R.drawable.ic_mobi_video_fill)
         Toast.makeText(this@MobiVideoPlayer, "Fit", Toast.LENGTH_SHORT).show()
         scaling?.setOnClickListener(firstListener)
     }
