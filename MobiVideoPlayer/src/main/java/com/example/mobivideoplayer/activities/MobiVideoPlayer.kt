@@ -103,6 +103,8 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
     private var startY = 0f
     private var isSeeking = false
     private var isVolume = true
+    private var isBottomSheetOpen = false
+
     private lateinit var binding: ActivityVideoPlayerBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -213,9 +215,10 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
             @RequiresApi(Build.VERSION_CODES.Q)
             @SuppressLint("Range")
             override fun onItemClick(position: Int) {
-                if (position == 0){
-                    dialogPlaylist()
-                }
+                if (position == 0 && !isBottomSheetOpen) { // Prevent multiple BottomSheets
+                        dialogPlaylist()
+                    }
+
                 if (position == 1) {
                     val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager?
                     if (appOps?.unsafeCheckOpNoThrow(AppOpsManager.OPSTR_PICTURE_IN_PICTURE, android.os.Process.myUid(), packageName) != AppOpsManager.MODE_ALLOWED){
@@ -557,7 +560,7 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
     }
 
     private fun dialogPlaylist(){
-
+        isBottomSheetOpen = true
         val dialog = BottomSheetDialog(this)
         // on below line we are inflating a layout file which we have created.
         val view = layoutInflater.inflate(R.layout.playlist_dialog, null)
@@ -569,6 +572,10 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
         recyclerView.layoutManager = mLayoutManager
         val adapter = PlaylistAdapter(this,mVideoFiles!!,mVideoFiles!![position],this)
         recyclerView.adapter = adapter
+
+        dialog.setOnDismissListener {
+            isBottomSheetOpen = false // Reset flag when BottomSheet is dismissed
+        }
 
         val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(this) {
             override fun getVerticalSnapPreference(): Int {
