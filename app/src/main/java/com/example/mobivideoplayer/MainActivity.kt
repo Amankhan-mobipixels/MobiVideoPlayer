@@ -2,26 +2,46 @@ package com.example.mobivideoplayer
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mobivideoplayer.activities.MobiVideoPlayer
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val hello = ArrayList<String>()
-        hello.add("/storage/emulated/0/DCIM/Y2Mate.is - Extreme Parkour and Freerunning-oIJ5m1_6E24-720p-1656942636636.mp4")
-        hello.add("/storage/emulated/0/DCIM/Video Editor/1.mp4")
-        hello.add("/storage/emulated/0/DCIM/Video Editor/2.mp4")
-        hello.add("/storage/emulated/0/DCIM/Video Editor/3.mp4")
-        hello.add("/storage/emulated/0/DCIM/Video Editor/4.mp4")
-        hello.add("/storage/emulated/0/DCIM/Video Editor/5.mp4")
-        hello.add("/storage/emulated/0/DCIM/Video Editor/6.mp4")
-        hello.add("/storage/emulated/0/DCIM/Video Editor/7.mp4")
 
         val intent = Intent(this, MobiVideoPlayer::class.java)
         intent.putExtra("position", 0)
-        intent.putStringArrayListExtra("videoArrayList", hello)
+        intent.putStringArrayListExtra("videoArrayList", getFilePath())
         startActivity(intent)
+
+
+    }
+
+    private fun getFilePath(): ArrayList<String> {
+        val data: ArrayList<String> = ArrayList()
+        val table = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(MediaStore.Video.VideoColumns.DATA)
+        val fileCursor = contentResolver.query(
+            table,
+            projection,
+            null,
+            null,
+            null
+        )
+        val path = fileCursor!!.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
+        while (fileCursor.moveToNext()) {
+            val path = fileCursor.getString(path)
+            val filePAth = File(path ?: "")
+            if (filePAth.exists()) {
+                data.add(path)
+
+            }
+        }
+        Log.d("bvdfbghsk", data.size.toString())
+        return data
     }
 }

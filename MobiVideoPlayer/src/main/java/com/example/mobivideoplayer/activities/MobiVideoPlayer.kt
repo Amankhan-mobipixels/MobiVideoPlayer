@@ -577,18 +577,13 @@ class MobiVideoPlayer: AppCompatActivity(), View.OnClickListener, Selected {
             isBottomSheetOpen = false // Reset flag when BottomSheet is dismissed
         }
 
-        val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(this) {
-            override fun getVerticalSnapPreference(): Int {
-                return SNAP_TO_START
+
+        for (i in mVideoFiles!!.indices){
+            if (mVideoFiles!![i] == mVideoFiles!![position]) {
+                mLayoutManager.scrollToPosition(i)
+                break
             }
         }
-        for (i in mVideoFiles!!.indices){
-            if (mVideoFiles!![i] == mVideoFiles!![position]) smoothScroller.targetPosition = i
-        }
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            mLayoutManager.startSmoothScroll(smoothScroller);
-        },200)
 
         close?.setOnClickListener{
             dialog.dismiss()
